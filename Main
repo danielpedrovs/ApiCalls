@@ -1,0 +1,42 @@
+// Project based on API calls that involves JS and Phyton//
+
+import requests
+
+def update_github_file(username, token, repo, file_path, new_content, branch='main'):
+    base_url = f'https://api.github.com/repos/{username}/{repo}/contents/{file_path}'
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Accept': 'application/vnd.github.v3+json'
+    }
+
+    # Fetch current file details
+    response = requests.get(base_url, headers=headers)
+    response_json = response.json()
+    current_sha = response_json['sha']
+    
+    # Prepare new file content
+    update_data = {
+        'path': file_path,
+        'message': 'Update file',
+        'content': new_content,
+        'sha': current_sha,
+        'branch': branch
+    }
+
+    # Update the file
+    update_response = requests.put(base_url, json=update_data, headers=headers)
+    
+    if update_response.status_code == 200:
+        print('File updated successfully.')
+    else:
+        print('File update failed.')
+        print(update_response.text)
+
+if __name__ == '__main__':
+    username = 'your_username'
+    token = 'your_personal_access_token'
+    repository = 'your_repository'
+    file_path = 'path/to/your/file'
+    new_content = 'New content for the file'
+    
+    update_github_file(username, token, repository, file_path, new_content)
